@@ -8,12 +8,8 @@ namespace Shared.DTOs
 {
     public class KeyConfigDto
     {
-        public string Id { get; set; }
-
-        public string ServiceId { get; set; }
-
         public string NameKey { get; set; }
-
+        public string Value { get; set; }
         public string Description { get; set; }
     }
 }

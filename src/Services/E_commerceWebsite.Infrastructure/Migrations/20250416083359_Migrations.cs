@@ -117,6 +117,22 @@ namespace E_commerceWebsite.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "KeyApp",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceKeyId = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    NameKey = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KeyApp", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Order",
                 columns: table => new
                 {
@@ -381,6 +397,9 @@ namespace E_commerceWebsite.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Invoice");
+
+            migrationBuilder.DropTable(
+                name: "KeyApp");
 
             migrationBuilder.DropTable(
                 name: "Order");

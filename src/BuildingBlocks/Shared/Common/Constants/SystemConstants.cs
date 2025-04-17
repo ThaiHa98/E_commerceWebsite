@@ -47,7 +47,7 @@ namespace Shared.Common.Constants
 
         public class KeyAppRouteSettings
         {
-            public const string GetServiceKeyId = "/keyapp?serviceKeyId=";
+            public const string GetServiceKeyId = "api/KeyApp/get-by-id?value=";
         }
 
         public static class PermissionsRouteSettings

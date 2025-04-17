@@ -31,16 +31,16 @@ try
 
     var app = builder.Build();
 
-    using (var scope = app.Services.CreateScope())
-    {
-        var redisService = scope.ServiceProvider.GetRequiredService<IStringRedisCacheService>();
-        var options = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(30) // tu? ch?nh th?i gian
-        };
+    //using (var scope = app.Services.CreateScope())
+    //{
+    //    var redisService = scope.ServiceProvider.GetRequiredService<IStringRedisCacheService>();
+    //    var options = new DistributedCacheEntryOptions
+    //    {
+    //        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(30) // tu? ch?nh th?i gian
+    //    };
 
-        await redisService.SetStringAsync("ResClientId", "abc-123456", options);
-    }
+    //    await redisService.SetStringAsync("ResClientId", "abc-123456", options);
+    //}
 
     app.UseInfrastructure();
 

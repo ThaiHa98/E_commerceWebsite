@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Shared.Common.ApiIntegration;
+using Shared.Common.ApiIntegration.KeyApp;
 using Shared.Common.Constants;
 using Shared.Common.Interfaces;
 using Shared.Enums;
 using static Shared.Common.Constants.SystemConstants;
 using ILogger = Serilog.ILogger;
 
-namespace E_commerceWebsite.API.Identity.Authorization
+namespace Warehouse.API.Identity.Authorization
 {
     public class ClaimRequirementFilter : IAuthorizationFilter
     {
@@ -20,6 +21,7 @@ namespace E_commerceWebsite.API.Identity.Authorization
         private readonly IWebHostEnvironment _env;
         private readonly IDistributedCache _redisCacheService;
         private readonly ISerializeService _serializeService;
+        private readonly IKeyAppApiClient _keyAppApiClient;
         private readonly IPermissionsApiClient _permissionsApiClient;
 
         public ClaimRequirementFilter(FunctionCode functionCode,
@@ -29,6 +31,7 @@ namespace E_commerceWebsite.API.Identity.Authorization
             IWebHostEnvironment env,
             IDistributedCache redisCacheService,
             ISerializeService serializeService,
+            IKeyAppApiClient keyAppApiClient,
             IPermissionsApiClient permissionsApiClient)
         {
             _functionCode = functionCode;
@@ -38,6 +41,7 @@ namespace E_commerceWebsite.API.Identity.Authorization
             _env = env ?? throw new ArgumentNullException(nameof(env));
             _redisCacheService = redisCacheService ?? throw new ArgumentNullException(nameof(redisCacheService));
             _serializeService = serializeService ?? throw new ArgumentNullException(nameof(serializeService));
+            _keyAppApiClient = keyAppApiClient ?? throw new ArgumentNullException(nameof(keyAppApiClient));
             _permissionsApiClient = permissionsApiClient ?? throw new ArgumentNullException(nameof(permissionsApiClient));
         }
 
@@ -55,6 +59,37 @@ namespace E_commerceWebsite.API.Identity.Authorization
             #region ConfigKey
             var configKeyCache = await _redisCacheService.GetStringAsync(CacheConstants.ResClientId);
 
+            // If cache is not found, get it from the API and store it
+            if (string.IsNullOrEmpty(configKeyCache))
+            {
+                try
+                {
+                    var configKey = await _keyAppApiClient.GetServiceAsync(_env.ApplicationName + "." + _env.EnvironmentName);
+                    if (!configKey.Success)
+                    {
+                        _logger.Information($"{nameof(AuthorizeAsync)} Response: {configKey.Message}");
+                        context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
+                        return;
+                    }
+
+                    var resClientId = configKey.Data.FirstOrDefault(c => c.NameKey == SystemConstants.AppSettings.ClientId)?.Description;
+                    if (resClientId != null)
+                    {
+                        await _redisCacheService.SetStringAsync(CacheConstants.ResClientId, _serializeService.Serialize(resClientId), options);
+                    }
+                    configKeyCache = resClientId; // Update value after setting it
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error fetching config key.");
+                    context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
+                    return;
+                }
+            }
+            if (configKeyCache.StartsWith("\"") && configKeyCache.EndsWith("\""))
+            {
+                configKeyCache = JsonConvert.DeserializeObject<string>(configKeyCache);
+            }
             var clientId = string.IsNullOrEmpty(configKeyCache) ? string.Empty : configKeyCache;
             #endregion
 
@@ -75,11 +110,11 @@ namespace E_commerceWebsite.API.Identity.Authorization
             {
                 try
                 {
-                    var resPermissions = await _permissionsApiClient.GetPermissionsAsync(userIdClaim.Value, clientId);
-                    if (resPermissions.Success)
+                    var res = await _permissionsApiClient.GetPermissionsAsync(userIdClaim.Value, clientId);
+                    if (res.Success)
                     {
-                        await _redisCacheService.SetStringAsync(cacheKey, _serializeService.Serialize(resPermissions.Data), options);
-                        permissionsCache = resPermissions.Data; // Update cache after saving
+                        await _redisCacheService.SetStringAsync(cacheKey, _serializeService.Serialize(res.Data), options);
+                        permissionsCache = res.Data; // Update cache after saving
                     }
                     else
                     {

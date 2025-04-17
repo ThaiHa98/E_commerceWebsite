@@ -30,6 +30,7 @@ namespace E_commerceWebsite.Infrastructure.Persistence
         public virtual DbSet<UserRoles> UsersRoles { get; set; }
         public virtual DbSet<Permissions> Permissions { get; set; }
         public virtual DbSet<RolePermissions> RolePermissions { get; set; }
+        public virtual DbSet<KeyApp> KeyApps { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -267,6 +268,36 @@ namespace E_commerceWebsite.Infrastructure.Persistence
                 entity.Property(e => e.Permission_Id).HasMaxLength(50);
                 entity.Property(e => e.FunctionCode).HasMaxLength(250);
                 entity.Property(e => e.CommandCode).HasMaxLength(250);
+            });
+
+            modelBuilder.Entity<KeyApp>(entity =>
+            {
+                entity.ToTable("KeyApp");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("Id")
+                    .IsRequired();
+
+                entity.Property(e => e.ServiceKeyId)
+                    .HasMaxLength(250)
+                    .IsRequired();
+
+                entity.Property(e => e.NameKey)
+                    .HasMaxLength(250)
+                    .IsRequired();
+
+                entity.Property(e => e.Value)
+                    .HasMaxLength(500)
+                    .IsRequired();
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .IsRequired();
             });
         }
     }

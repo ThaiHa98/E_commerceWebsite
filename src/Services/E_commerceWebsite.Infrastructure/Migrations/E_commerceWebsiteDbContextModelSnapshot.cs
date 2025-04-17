@@ -226,6 +226,40 @@ namespace E_commerceWebsite.Infrastructure.Migrations
                     b.ToTable("Invoice", (string)null);
                 });
 
+            modelBuilder.Entity("E_commerceWebsite.Domain.Entities.KeyApp", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("NameKey")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("ServiceKeyId")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KeyApp", (string)null);
+                });
+
             modelBuilder.Entity("E_commerceWebsite.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("GuidId")

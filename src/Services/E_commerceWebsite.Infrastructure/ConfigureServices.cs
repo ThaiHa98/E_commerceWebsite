@@ -11,6 +11,7 @@ using Shared.Common.ApiIntegration.ResClient;
 using Shared.Common.Services;
 using Microsoft.Extensions.Configuration;
 using E_commerceWebsite.Infrastructure.Helper;
+using Shared.Common.ApiIntegration.KeyApp;
 
 
 namespace E_commerceWebsite.Infrastructure
@@ -41,6 +42,8 @@ namespace E_commerceWebsite.Infrastructure
             services.AddScoped<IRolesRepository, RolesRepositories>();
             services.AddScoped<IPermissionsRepository, PermissionsRepositories>();
             services.AddScoped<CheckRolesRepositories>();
+            services.AddScoped<CreateKeyAppRepositories>();
+            services.AddScoped<IKeyAppApiClient, KeyAppApiClient>();
 
 
             return services;

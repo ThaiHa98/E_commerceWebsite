@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
+using Warehouse.API.Identity.Authorization;
 
 namespace E_commerceWebsite.API.Identity.Authorization
 {

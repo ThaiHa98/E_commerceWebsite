@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_commerceWebsite.Infrastructure.Migrations
 {
     [DbContext(typeof(E_commerceWebsiteDbContext))]
-    [Migration("20250415042943_Migrations")]
+    [Migration("20250416083359_Migrations")]
     partial class Migrations
     {
         /// <inheritdoc />
@@ -227,6 +227,40 @@ namespace E_commerceWebsite.Infrastructure.Migrations
                     b.HasKey("GuidId");
 
                     b.ToTable("Invoice", (string)null);
+                });
+
+            modelBuilder.Entity("E_commerceWebsite.Domain.Entities.KeyApp", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("NameKey")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("ServiceKeyId")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KeyApp", (string)null);
                 });
 
             modelBuilder.Entity("E_commerceWebsite.Domain.Entities.Order", b =>
