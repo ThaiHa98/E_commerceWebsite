@@ -3,11 +3,13 @@ using E_commerceWebsite.Application.Features.User.Commands.CreateUser;
 using E_commerceWebsite.Application.Features.User.Commands.CreateUserEmployee;
 using E_commerceWebsite.Application.Features.User.Commands.Login;
 using E_commerceWebsite.Application.Features.User.Commands.Logout;
+using E_commerceWebsite.Application.Features.User.Commands.Update;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shared.DTOs;
+using Shared.DTOs.User;
 using Shared.Enums;
 using Shared.SeedWork;
 using System.Net;
@@ -35,7 +37,7 @@ namespace E_commerceWebsite.API.Controllers
         #region Methods
         [Route("Create-Customer")]
         [HttpPost]
-        public async Task<ActionResult<string>> CreateCustomer([FromBody] CreateUserDto entity)
+        public async Task<ActionResult<string>> CreateCustomer([FromBody] CreateUserCustomerDto entity)
         {
             try
             {
@@ -157,6 +159,36 @@ namespace E_commerceWebsite.API.Controllers
                     success = false,
                     httpStatusCode = (int)HttpStatusCode.BadRequest,
                     message = ex.Message
+                });
+            }
+        }
+
+        [ClaimRequirement(FunctionCode.Admin, CommandCode.UPDATE)]
+        [Route("update")]
+        [HttpPost]
+        public async Task<ActionResult<string>> Update([FromBody] UpdateUserDto entity)
+        {
+            try
+            {
+                _logger.Information($"Begin {Methods} {nameof(Update)} request: {JsonConvert.SerializeObject(entity)}");
+
+                var query = new UpdateUserCommand(entity);
+                var result = await _mediator.Send(query);
+
+                _logger.Information($"End {Methods} {nameof(Update)} repose: {result}");
+                return Ok(new ApiResultBase
+                {
+                    success = true,
+                    message = result
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.Information($"Exception {Methods} {nameof(Update)}: {ex.Message}");
+                return BadRequest(new ApiResultBase
+                {
+                    message = ex.Message,
+                    success = false
                 });
             }
         }

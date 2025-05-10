@@ -1,10 +1,12 @@
-﻿using E_commerceWebsite.Application.Features.Permission.Commands.Create;
+﻿using E_commerceWebsite.API.Identity.Authorization;
+using E_commerceWebsite.Application.Features.Permission.Commands.Create;
 using E_commerceWebsite.Application.Features.Role.Commands.CreateRole;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shared.DTOs;
+using Shared.Enums;
 using Shared.SeedWork;
 using ILogger = Serilog.ILogger;
 
@@ -27,6 +29,7 @@ namespace E_commerceWebsite.API.Controllers
         #endregion
 
         #region Methods
+        [ClaimRequirement(FunctionCode.Admin, CommandCode.CREATE)]
         [Route("create")]
         [HttpPost]
         public async Task<ActionResult<string>> Create([FromBody] CreatePermissionsDto entity)

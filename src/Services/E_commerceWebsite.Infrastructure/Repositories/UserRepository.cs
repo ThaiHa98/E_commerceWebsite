@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using E_commerceWebsite.Infrastructure.Helper;
+using Shared.DTOs.User;
 
 namespace E_commerceWebsite.Infrastructure.Repositories
 {
@@ -53,7 +54,7 @@ namespace E_commerceWebsite.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<string> InsertAsyncCustomer(CreateUserDto request)
+        public async Task<string> InsertAsyncCustomer(CreateUserCustomerDto request)
         {
             try
             {
@@ -71,10 +72,25 @@ namespace E_commerceWebsite.Infrastructure.Repositories
                     Gender = request.Gender,
                     Phone = request.Phone,
                     Date_of_birth = request.Date_of_birth,
-                    //Role = UserRole.Customer,
                     Date_Create = DateTime.Now,
                 };
                 _dbContext.Users.Add(user);
+
+                var usRoles = await _dbContext.Roles
+                                    .FirstOrDefaultAsync(ro => ro.GuidId == Guid.Parse("7BC697B1-4EB7-41EC-80D6-703D8D2D1754"));
+                if (usRoles == null)
+                {
+                    return "usRoles not found";
+                }
+                var userRoles = new UserRoles
+                {
+                    GuidId = Guid.NewGuid(),
+                    User_Id = user.GuidId,
+                    User_Name = user.First_name + " " + user.Last_name,
+                    Role_Id = usRoles.GuidId,
+                    Role_Name = usRoles.Name,
+                };
+                _dbContext.UsersRoles.Add(userRoles);
                 var result = await _dbContext.SaveChangesAsync();
                 return result > 0 ? MessageConstants.CREATED_OK_MSG : MessageConstants.CREATED_ERR_MSG;
             }
@@ -85,9 +101,31 @@ namespace E_commerceWebsite.Infrastructure.Repositories
             }
         }
 
-        public Task<string> UpdateAsync(UpdateUserDto entity)
+        public async Task<string> UpdateAsync(UpdateUserDto entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var query = await _dbContext.Users.FirstOrDefaultAsync(u => u.GuidId == entity.GuidId);
+                if(query == null)
+                {
+                    return $"{query.GuidId} not found";
+                }
+                query.Last_name = entity.Last_name;
+                query.First_name = entity.First_name;
+                query.Email = entity.Email;
+                query.Gender = entity.Gender;
+                query.Phone = entity.Phone;
+                query.Date_of_birth = entity.Date_of_birth;
+
+                _dbContext.Users.Update(query);
+                var result = await _dbContext.SaveChangesAsync();
+                return result > 0 ? MessageConstants.UPDATED_OK_MSG : MessageConstants.UPDATED_ERR_MSG;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Exception {Methods} {nameof(UpdateAsync)}: {ex.Message}");
+                return ex.Message;
+            }
         }
 
         public async Task<string> InsertAsyncEmployee(CreateUserDto request)

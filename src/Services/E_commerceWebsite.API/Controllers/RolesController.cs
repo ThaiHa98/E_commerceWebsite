@@ -1,4 +1,5 @@
-﻿using E_commerceWebsite.Application.Features.Role.Commands.CreateRole;
+﻿using E_commerceWebsite.API.Identity.Authorization;
+using E_commerceWebsite.Application.Features.Role.Commands.CreateRole;
 using E_commerceWebsite.Application.Features.Role.Commands.Delete;
 using E_commerceWebsite.Application.Features.Role.Commands.Update;
 using E_commerceWebsite.Application.Features.Role.Queries.GetById;
@@ -7,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shared.DTOs;
+using Shared.Enums;
 using Shared.SeedWork;
 using ILogger = Serilog.ILogger;
 
@@ -29,6 +31,7 @@ namespace E_commerceWebsite.API.Controllers
         #endregion
 
         #region Methods
+        [ClaimRequirement(FunctionCode.Admin, CommandCode.CREATE)]
         [Route("create")]
         [HttpPost]
         public async Task<ActionResult<string>> Create([FromBody] CreateRolesDto entity)
