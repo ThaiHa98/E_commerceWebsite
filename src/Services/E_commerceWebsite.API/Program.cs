@@ -6,6 +6,9 @@ using Serilog;
 using E_commerceWebsite.API.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Shared.Common.ApiIntegration.ResClient;
+using Shared.Common.ApiIntegration.KeyApp;
+using Shared.Common.ApiIntegration.Permissions;
+using Shared.Common.ApiIntegration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,8 @@ try
     builder.Services.ConfigureSwagger();
     builder.Services.ConfigureRedis();
     builder.Services.AddMemoryCache();
+    builder.Services.AddScoped<IKeyAppApiClient, KeyAppApiClient>();
+    builder.Services.AddScoped<IPermissionsApiClient, PermissionsApiClient>();
 
     builder.Services.ConfigureCors();
 

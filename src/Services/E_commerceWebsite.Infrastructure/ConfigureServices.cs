@@ -12,6 +12,7 @@ using Shared.Common.Services;
 using Microsoft.Extensions.Configuration;
 using E_commerceWebsite.Infrastructure.Helper;
 using Shared.Common.ApiIntegration.KeyApp;
+using Shared.Common.Interfaces;
 
 
 namespace E_commerceWebsite.Infrastructure
@@ -44,6 +45,10 @@ namespace E_commerceWebsite.Infrastructure
             services.AddScoped<CheckRolesRepositories>();
             services.AddScoped<CreateKeyAppRepositories>();
             services.AddScoped<IKeyAppApiClient, KeyAppApiClient>();
+            services.AddScoped<IRolePermissionsRepository, RolePermissionsRepository>();
+
+            services.AddScoped<IKeyAppApiClient, KeyAppApiClient>();
+            services.AddScoped<IPermissionsApiClient, PermissionsApiClient>();
 
 
             return services;

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Shared.Common;
 
 namespace Shared.DTOs
 {
-    public class UserSearchDto
+    public class UserSearchDto : SearchPagingModel
     {
+        
     }
 }

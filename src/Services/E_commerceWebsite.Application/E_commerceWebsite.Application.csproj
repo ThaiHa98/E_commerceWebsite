@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Features\CheckRole\Queries\" />
-    <Folder Include="Features\User\Queries\" />
   </ItemGroup>
 
 </Project>

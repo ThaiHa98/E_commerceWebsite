@@ -11,8 +11,7 @@ namespace E_commerceWebsite.Application.Common.Interfaces
         Task<string> UpdateAsync(UpdateUserDto entity);
         Task<string> DeletesAsync(Guid id);
         Task<Pagination<UserDto>> GetPaging(UserSearchDto request);
-        Task<UserDto> GetById(string id);
-        Task<IList<UserDto>> GetAllStoresAsync();
+        Task<UserDto> GetById(Guid id);
         Task<string> Login(LoginRequest loginRequest);
         Task<string> Logout(Guid GuidId);
     }

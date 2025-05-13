@@ -39,19 +39,77 @@ namespace E_commerceWebsite.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<IList<UserDto>> GetAllStoresAsync()
+        public async Task<UserDto> GetById(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.GuidId == id);
+
+                if (user == null)
+                {
+                    return null;
+                }
+
+                return new UserDto
+                {
+                    GuidId = user.GuidId,
+                    First_name = user.First_name,
+                    Last_name = user.Last_name,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                    Gender = user.Gender,
+                    Date_of_birth = user.Date_of_birth
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Exception in {nameof(GetById)}: {ex.Message}");
+                return null;
+            }
         }
 
-        public Task<UserDto> GetById(string id)
+        public async Task<Pagination<UserDto>> GetPaging(UserSearchDto request)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                request.Keywords = request.Keywords?.Trim();
 
-        public Task<Pagination<UserDto>> GetPaging(UserSearchDto request)
-        {
-            throw new NotImplementedException();
+                var query = _dbContext.Users
+                    .AsNoTracking()
+
+                    .Where(u => string.IsNullOrEmpty(request.Keywords)
+                        || u.First_name.Contains(request.Keywords)
+                        || u.Email.Contains(request.Keywords)
+                        || u.Phone.Contains(request.Keywords))
+                    .Select(u => new UserDto
+                    {
+                        GuidId = u.GuidId,
+                        Last_name = u.Last_name,
+                        First_name = u.First_name,
+                        Email = u.Email,
+                        Gender = u.Gender,
+                        Phone = u.Phone,
+                        Date_of_birth = u.Date_of_birth,
+                    });
+
+                var totalRecords = await query.CountAsync();
+
+                var paginatedList = await query
+                    .Skip((request.PageIndex - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync();
+
+                return new Pagination<UserDto>
+                {
+                    Items = paginatedList,
+                    TotalRecords = totalRecords
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.Information($"Exception {nameof(GetPaging)} error: {ex.Message}");
+                return new Pagination<UserDto>();
+            }
         }
 
         public async Task<string> InsertAsyncCustomer(CreateUserCustomerDto request)
